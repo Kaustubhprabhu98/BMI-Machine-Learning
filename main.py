@@ -19,7 +19,7 @@ s3 = boto_session.resource('s3')
 region = boto_session.region_name
 print(region)
 sagemaker_session = sagemaker.Session()
-role = "enter role ARN here"
+role = "arn:aws:iam::258273015834:role/service-role/AmazonSageMaker-ExecutionRole-20230531T215693"
 
 #Build tar file with model data + inference code
 bashCommand = "tar -cvpzf model.tar.gz model.joblib inference.py"
@@ -44,7 +44,7 @@ model_artifacts = f"s3://{default_bucket}/model.tar.gz"
 response = s3.meta.client.upload_file('model.tar.gz', default_bucket, 'model.tar.gz')
 
 #Step 1: Model Creation
-model_name = "sklearn-test" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+model_name = "bmi" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 print("Model name: " + model_name)
 create_model_response = client.create_model(
     ModelName=model_name,
@@ -63,7 +63,7 @@ print("Model Arn: " + create_model_response["ModelArn"])
 
 
 #Step 2: EPC Creation
-sklearn_epc_name = "sklearn-epc" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+sklearn_epc_name = "bmi-epc" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 endpoint_config_response = client.create_endpoint_config(
     EndpointConfigName=sklearn_epc_name,
     ProductionVariants=[
@@ -79,7 +79,7 @@ print("Endpoint Configuration Arn: " + endpoint_config_response["EndpointConfigA
 
 
 #Step 3: EP Creation
-endpoint_name = "sklearn-local-ep" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+endpoint_name = "bmi-local-ep" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 create_endpoint_response = client.create_endpoint(
     EndpointName=endpoint_name,
     EndpointConfigName=sklearn_epc_name,
